@@ -1,13 +1,25 @@
 
+import { useState } from "react";
 import { Header } from "../components/Header";
 import { Task } from "../components/Task";
 import { styles } from "./styles";
-import { View, Text } from 'react-native'
+import { View, Text, FlatList } from 'react-native'
+import { TaskDTO } from "../dtos/TaskDTO";
+import { Empty } from "../components/Empty";
 
 export function HomeScreen() {
+    const [tasks, setTasks] = useState<TaskDTO[]>([]);
+    const [newTask, setNewTask] = useState('');
+
+    function handleTaskAdd() {  /*função no qual tras o adicionar tarefa para a list */
+        setTasks((tasks) => [
+            ... tasks, 
+                { id: '', isCompleted: false, title: newTask},
+        ])
+    }
  return (
     <View style={styles.container}>
-        <Header />
+        <Header task={newTask} onChangeText={setNewTask} onPress={handleTaskAdd}/>
         <View style={styles.tasksContainer}>
             <View style={styles.info}>
                 <View style={styles.row}>
@@ -24,10 +36,19 @@ export function HomeScreen() {
                 </View>
                 
             </View>
-            <Task />
-            <Task />
-            <Task />
-            <Task />
+
+            <FlatList 
+                data={tasks}
+                keyExtractor={(tasks) => tasks.id!}
+                renderItem={({ item }) => ( 
+                    <Task 
+                    key={item.id} 
+                    isCompleted={item.isCompleted} 
+                    title={item.title}
+                    />
+                )}
+                ListEmptyComponent={<Empty />}
+            />
         </View>
     </View>
  );
